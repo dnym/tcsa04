@@ -29,3 +29,24 @@
   - For date, `YYYY-MM-DD`. For time, `HH:mm:ss`.
 - "Allow for changing the order of records between ascending and descending", but sorting on which key?
   - Shouldn't matter, although since users may log overlapping sessions, sort by `StartTime`.
+
+## MVP Functionality
+
+### Necessary Functionality
+- Create SQLite database with tables
+- Store coding session logs in and retrieve coding session logs from DB using ADO.NET
+  - Map into `List<CodingSession>`
+- Handle a configuration file
+- Menu system for navigating the application
+  - Main menu
+  - Log new coding session
+  - Coding session logs management screen
+    - Pagination 
+
+### Possible Later Functionality
+- Live tracking using a stopwatch
+- Filter logs by period
+- Toggle log listing order between ascending or descending
+- Report generation by period
+- User goal setting
+  - Goal progress indicator
