@@ -23,3 +23,7 @@
 ### More Questions & Decisions
 - Should all three of `StartTime`, `EndTime`, and `Duration` be stored in the database?
   - No, `Duration` is secondary information to be calculated from `StartTime` and `EndTime`.
+- What if there is no configuration file?
+  - Use default values.
+- Which date input format should be used?
+  - For date, `YYYY-MM-DD`. For time, `HH:mm:ss`.
