@@ -52,3 +52,73 @@
 - Report generation by period
 - User goal setting
   - Goal progress indicator
+
+## User Interface
+Main menu:
+```text
+Coding Tracker
+==============
+
+1. Log Coding Session
+2. Manage Coding Session Logs
+0. Quit
+
+------------
+Press a number to select.
+```
+
+Logging:
+```text
+Log Coding Session
+==================
+
+At what date did you start coding? 2023-10-09
+At what time did you start coding? 23:45:00
+
+At what date did you stop coding? 2023-10-10
+At what time did you stop coding? _
+
+------------------
+Input time in the format HH:mm or HH:mm:ss,
+or press [Enter] to use the current time: 11:31:12
+Press [Esc] to cancel insertion.
+```
+
+Log management:
+```text
+Coding Sessions (page 2/3)
+==========================
+
+ 1. 2h54m @ 2020-08-05, from 14:36:42 to 17:30:15
+ 2. 2h34m @ 2020-12-12, from 05:41:18 to 08:15:30
+ 3. 4h31m @ 2021-10-03, from 08:14:37 to 12:45:22
+ 4. 1h55m @ 2021-11-27, from 16:45:29 to 18:40:09
+ 5. 1h57m @ 2022-04-15, from 09:23:51 to 11:20:37
+ 6. 0h16m @ 2022-06-19, from 20:55:03 to 21:10:55
+ 7. 2h47m @ 2022-09-08, from 22:19:01 to 01:05:50 on 2022-09-09
+ 8. 2h13m @ 2023-01-10, from 11:07:14 to 13:20:37
+ 9. 0h56m @ 2023-03-28, from 17:29:56 to 18:25:40
+10. 3h00m @ 2023-05-30, from 13:50:27 to 16:50:12
+
+Select a session to manage: _
+
+--------------------------
+Press [PgUp] to go to the previous page,
+[PgDown] to go to the next page,
+or [Esc] to go back to the main menu.
+```
+
+Single log management:
+```text
+Viewing Coding Session
+======================
+
+Start: 2020-12-12 05:41:18
+End: 2020-12-12 08:15:30
+Duration: 2h 36m 12s
+
+----------------------
+Press [M] to modify the session,
+[D] to delete,
+or [Esc] to go back to the main menu.
+```
