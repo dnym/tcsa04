@@ -132,3 +132,13 @@ or [Esc] to go back to the main menu.
 - [x] Connecting to SQLite
 - [x] Basic SQL
 - [x] Read a config file
+
+## Data Structures
+- CodingSession
+  - Id (int)
+  - StartTime (DateTime)
+  - EndTime (DateTime)
+  - Duration (TimeSpan)
+    - Calculated using `EndTime - StartTime`
+- All Coding Sessions
+  - List of logs (List\<CodingSession\>)
