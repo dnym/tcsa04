@@ -122,3 +122,13 @@ Press [M] to modify the session,
 [D] to delete,
 or [Esc] to go back to the main menu.
 ```
+
+## Logic Checklist
+- [x] Taking console text input
+  - [x] Interpreting date-time strings
+- [x] Printing console text output
+- [x] Installing NuGet packages
+- [x] Basic C#
+- [x] Connecting to SQLite
+- [x] Basic SQL
+- [x] Read a config file
