@@ -19,3 +19,7 @@
   - >The reports should be shown within the application to provide immediate feedback to the user. There's no specific requirement to export them to a file format unless it's specified as an additional feature.
 - As for "Allow for setting goals" and "Show user time until reaching goal including hours per day necessary", where should this be shown? In the main menu? Everywhere?
   - >The "setting goals" feature should ideally be accessible from the main menu, and the progress toward the goal, including hours per day necessary, should be displayed within the application, possibly in a dedicated section or menu related to goals.
+
+### More Questions & Decisions
+- Should all three of `StartTime`, `EndTime`, and `Duration` be stored in the database?
+  - No, `Duration` is secondary information to be calculated from `StartTime` and `EndTime`.
