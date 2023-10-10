@@ -19,6 +19,8 @@
   - >The reports should be shown within the application to provide immediate feedback to the user. There's no specific requirement to export them to a file format unless it's specified as an additional feature.
 - As for "Allow for setting goals" and "Show user time until reaching goal including hours per day necessary", where should this be shown? In the main menu? Everywhere?
   - >The "setting goals" feature should ideally be accessible from the main menu, and the progress toward the goal, including hours per day necessary, should be displayed within the application, possibly in a dedicated section or menu related to goals.
+- What if the user inserts overlapping sessions?
+  - >If a user inserts overlapping sessions, the application should detect and handle this as an error, providing a clear message to the user. Overlapping sessions could lead to incorrect time calculations, so they should not be allowed.
 
 ### More Questions & Decisions
 - Should all three of `StartTime`, `EndTime`, and `Duration` be stored in the database?
@@ -28,7 +30,7 @@
 - Which date input format should be used?
   - For date, `YYYY-MM-DD`. For time, `HH:mm:ss`.
 - "Allow for changing the order of records between ascending and descending", but sorting on which key?
-  - Shouldn't matter, although since users may log overlapping sessions, sort by `StartTime`.
+  - Doesn't matter since overlapping sessions are not allowed.
 
 ## MVP Functionality
 
@@ -41,7 +43,7 @@
   - Main menu
   - Log new coding session
   - Coding session logs management screen
-    - Pagination 
+    - Pagination
 
 ### Possible Later Functionality
 - Live tracking using a stopwatch
