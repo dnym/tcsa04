@@ -27,3 +27,5 @@
   - Use default values.
 - Which date input format should be used?
   - For date, `YYYY-MM-DD`. For time, `HH:mm:ss`.
+- "Allow for changing the order of records between ascending and descending", but sorting on which key?
+  - Shouldn't matter, although since users may log overlapping sessions, sort by `StartTime`.
