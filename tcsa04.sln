@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingTracker", "CodingTracker\CodingTracker.csproj", "{92ED8094-5148-4631-AA65-AFD45670E808}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCSAHelper", "TCSAHelper\TCSAHelper.csproj", "{DEF9F2A6-9A11-4370-98D6-09867CEBA2F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{92ED8094-5148-4631-AA65-AFD45670E808}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92ED8094-5148-4631-AA65-AFD45670E808}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92ED8094-5148-4631-AA65-AFD45670E808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEF9F2A6-9A11-4370-98D6-09867CEBA2F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEF9F2A6-9A11-4370-98D6-09867CEBA2F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEF9F2A6-9A11-4370-98D6-09867CEBA2F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEF9F2A6-9A11-4370-98D6-09867CEBA2F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
