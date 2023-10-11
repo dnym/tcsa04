@@ -13,8 +13,8 @@ internal static class MainMenu
 2. Manage Coding Session Logs
 0. Quit",
             footer: (_, _) => "Press a number to select.");
-        screen.AddAction(ConsoleKey.D1, () => Debug.WriteLine("LogSession.Get().Show()"));
-        screen.AddAction(ConsoleKey.D2, () => Debug.WriteLine("ManageLogs.Get().Show()"));
+        screen.AddAction(ConsoleKey.D1, () => SessionLoggingScreen.Get().Show());
+        screen.AddAction(ConsoleKey.D2, () => LogManagementScreen.Get().Show());
         screen.AddAction(ConsoleKey.D0, () => screen.ExitScreen());
         return screen;
     }
