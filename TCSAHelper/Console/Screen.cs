@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace TCSAHelper.Console;
 
-namespace TCSAHelper.Console;
 public class Screen
 {
     private readonly Func<int, int, string> _header;
@@ -17,7 +12,7 @@ public class Screen
 
     public Action ExitScreen => () => _stayInScreen = false;
 
-    public Screen(Func<int, int, string>? header, Func<int, int, string> body, Func<int, int, string> footer, IDictionary<ConsoleKey, Action>? actions = null, Action? anyKeyAction = null, Action<string>? promptHandling = null)
+    public Screen(Func<int, int, string>? header = null, Func<int, int, string>? body = null, Func<int, int, string>? footer = null, IDictionary<ConsoleKey, Action>? actions = null, Action? anyKeyAction = null, Action<string>? promptHandling = null)
     {
         Func<int, int, string> nullFunc = (_, _) => "";
         _header = header ?? nullFunc;
@@ -109,7 +104,7 @@ public class Screen
                 var takeInput = true;
                 string userInput = "";
                 int userInputPosition = 0;
-                while (takeInput)
+                while (_stayInScreen && takeInput)
                 {
                     var pressedKeyInfo = System.Console.ReadKey(true);
                     var pressedKey = pressedKeyInfo.Key;
