@@ -1,12 +1,12 @@
-﻿using CodingTracker.Models;
-using System.Diagnostics;
+﻿using CodingTracker.DataAccess;
+using CodingTracker.Models;
 using TCSAHelper.Console;
 
 namespace CodingTracker.UI;
 
 internal static class SessionLoggingScreen
 {
-    internal static Screen Get()
+    internal static Screen Get(IDataAccess dataAccess)
     {
         const string header = "Log Coding Session";
         const string mainDateFormat = "yyyy-MM-dd";
@@ -96,6 +96,7 @@ Press [Esc] to cancel insertion.";
 
         void promptHandler(string text)
         {
+            // This function is called when the user presses [Enter] to submit their input. We can only tell what they were inputting by looking at what has already been input.
             if (startDate == null)
             {
                 if (string.IsNullOrEmpty(text))
@@ -149,7 +150,7 @@ Press [Esc] to cancel insertion.";
                     screen.SetPromptAction(null);
                     screen.SetAnyKeyAction(() =>
                     {
-                        Debug.WriteLine($"Created session {newSession.StartTime} to {newSession.EndTime}");
+                        dataAccess.Insert(newSession);
                         screen.ExitScreen();
                     });
                 }

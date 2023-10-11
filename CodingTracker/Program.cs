@@ -1,10 +1,13 @@
-﻿namespace CodingTracker;
+﻿using CodingTracker.DataAccess;
+
+namespace CodingTracker;
 
 internal static class Program
 {
     static void Main()
     {
-        UI.MainMenu.Get().Show();
+        IDataAccess dataAccess = new MemoryStorage();
+        UI.MainMenu.Get(dataAccess).Show();
         Console.Clear();
     }
 }

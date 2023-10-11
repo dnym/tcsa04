@@ -1,11 +1,11 @@
-﻿using System.Diagnostics;
+﻿using CodingTracker.DataAccess;
 using TCSAHelper.Console;
 
 namespace CodingTracker.UI;
 
 internal static class MainMenu
 {
-    internal static Screen Get()
+    internal static Screen Get(IDataAccess dataAccess)
     {
         var screen = new Screen(
             header: (_, _) => "Coding Tracker",
@@ -13,8 +13,8 @@ internal static class MainMenu
 2. Manage Coding Session Logs
 0. Quit",
             footer: (_, _) => "Press a number to select.");
-        screen.AddAction(ConsoleKey.D1, () => SessionLoggingScreen.Get().Show());
-        screen.AddAction(ConsoleKey.D2, () => LogManagementScreen.Get().Show());
+        screen.AddAction(ConsoleKey.D1, () => SessionLoggingScreen.Get(dataAccess).Show());
+        screen.AddAction(ConsoleKey.D2, () => LogManagementScreen.Get(dataAccess).Show());
         screen.AddAction(ConsoleKey.D0, () => screen.ExitScreen());
         return screen;
     }

@@ -1,4 +1,5 @@
 ﻿using CodingTracker.Models;
+using System.Diagnostics;
 
 namespace CodingTracker.DataAccess;
 
@@ -8,7 +9,10 @@ internal class MemoryStorage : IDataAccess
 
     public void Insert(CodingSession session)
     {
-        _sessions.Add(Clone(session));
+        session = Clone(session);
+        session.Id = _sessions.Count + 1;
+        _sessions.Add(session);
+        Debug.WriteLine($"Inserted session {session.Id}: [{session.StartTime}] to [{session.EndTime}]");
     }
 
     public CodingSession? Get(int id)
@@ -18,12 +22,15 @@ internal class MemoryStorage : IDataAccess
         {
             output = Clone(output);
         }
+        Debug.WriteLine(output != null ? $"Retrieved session {id}" : $"Failed to retrieve session {id}");
         return output;
     }
 
     public IEnumerable<CodingSession> GetAll()
     {
-        return _sessions.Select(Clone);
+        var output = _sessions.Select(Clone);
+        Debug.WriteLine($"Retrieved {output.Count()} sessions");
+        return output;
     }
 
     public void Update(CodingSession session)
@@ -32,12 +39,18 @@ internal class MemoryStorage : IDataAccess
         if (index != -1)
         {
             _sessions[index] = Clone(session);
+            Debug.WriteLine($"Updated session {session.Id}");
+        }
+        else
+        {
+            Debug.WriteLine($"Failed to update session {session.Id}");
         }
     }
 
     public void Delete(int id)
     {
-        _sessions.RemoveAll(s => s.Id == id);
+        bool deleted = _sessions.RemoveAll(s => s.Id == id) > 0;
+        Debug.WriteLine(deleted ? $"Deleted session {id}" : $"Failed to delete session {id}");
     }
 
     private static CodingSession Clone(CodingSession session)
