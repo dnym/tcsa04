@@ -72,9 +72,9 @@ public class Screen
             System.Console.Clear();
             // "- 4" is for having space and a bar between header and body, and between body and footer.
             var (winWidth, winHeight) = (System.Console.WindowWidth - 4, System.Console.WindowHeight);
-            var header = CapStrings(winWidth, winHeight, _header(winWidth, winHeight));
-            var body = CapStrings(winWidth, winHeight, _body(winWidth, winHeight));
-            var footer = CapStrings(winWidth, winHeight, _footer(winWidth, winHeight));
+            var header = CapStrings(winHeight, winWidth, _header(winWidth, winHeight));
+            var body = CapStrings(winHeight, winWidth, _body(winWidth, winHeight));
+            var footer = CapStrings(winHeight, winWidth, _footer(winWidth, winHeight));
             var barLength = Math.Max(LongestLine(header), LongestLine(footer));
             System.Console.WriteLine(header);
             System.Console.WriteLine(new string('=', barLength) + "\n");
@@ -101,6 +101,7 @@ public class Screen
             }
             else
             {
+                System.Console.CursorVisible = true;
                 var takeInput = true;
                 string userInput = "";
                 int userInputPosition = 0;
