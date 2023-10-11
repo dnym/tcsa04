@@ -28,12 +28,17 @@ public class Screen
         _actions.Add(consoleKey, action);
     }
 
-    public void SetAnyKeyAction(Action action)
+    public void RemoveAction(ConsoleKey consoleKey)
+    {
+        _actions.Remove(consoleKey);
+    }
+
+    public void SetAnyKeyAction(Action? action)
     {
         _anyKeyAction = action;
     }
 
-    public void SetPromptAction(Action<string> action)
+    public void SetPromptAction(Action<string>? action)
     {
         _promptHandling = action;
     }
