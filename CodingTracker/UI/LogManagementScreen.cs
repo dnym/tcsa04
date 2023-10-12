@@ -1,4 +1,5 @@
 ﻿using CodingTracker.DataAccess;
+using CodingTracker.Models;
 using System.Text;
 using TCSAHelper.Console;
 
@@ -10,7 +11,7 @@ internal static class LogManagementScreen
     {
         const int headerHeight = 3;
         const int footerHeight = 5;// Actual height varies between 3-5, but we'll use a constant for regularity.
-        const int promptHeight = 0;
+        const int promptHeight = 2;
         int lastListUsableHeight = 0;
         int listUsableHeight = 0;
         int skip = 0;
@@ -20,7 +21,7 @@ internal static class LogManagementScreen
             listUsableHeight = usableHeight - headerHeight - footerHeight - promptHeight;
             if (listUsableHeight != lastListUsableHeight)
             {
-                // If the list height changes, we reset the skip to keep it simple. What should otherwise happen is a bit unclear.
+                // If the list height changes, we reset the skip (i.e. return to page 1) to keep it simple. What should otherwise happen is a bit unclear.
                 skip = 0;
             }
             lastListUsableHeight = listUsableHeight;
@@ -59,7 +60,8 @@ internal static class LogManagementScreen
 
         string body(int _1, int _2)
         {
-            return MakeListString(dataAccess, skip, listUsableHeight);
+            var sessions = GetSubset(dataAccess, skip, listUsableHeight);
+            return MakeListString(sessions);
         }
 
         void pgUp()
@@ -85,9 +87,13 @@ internal static class LogManagementScreen
         return screen;
     }
 
-    private static string MakeListString(IDataAccess dataAccess, int skip = 0, int take = int.MaxValue)
+    private static List<CodingSession> GetSubset(IDataAccess dataAccess, int skip = 0, int take = int.MaxValue)
     {
-        var sessions = dataAccess.GetAll().OrderBy(cs => cs.StartTime.Ticks).Skip(skip).Take(take).ToList();
+        return dataAccess.GetAll().OrderBy(cs => cs.StartTime.Ticks).Skip(skip).Take(take).ToList();
+    }
+
+    private static string MakeListString(List<CodingSession> sessions)
+    {
         var numberWidth = sessions.Count.ToString().Length;
         var durationStrings = sessions.ConvertAll(cs => DurationString(cs.Duration));
         var durationWidth = durationStrings.Max(ds => ds.Length);
