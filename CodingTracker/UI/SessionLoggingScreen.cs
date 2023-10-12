@@ -197,6 +197,6 @@ Press [Esc] to cancel insertion.";
 
     private static DateTime CombineDateTime(DateOnly date, TimeOnly time)
     {
-        return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
+        return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second).ToUniversalTime();
     }
 }
