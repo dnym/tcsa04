@@ -26,11 +26,11 @@ internal class MemoryStorage : IDataAccess
         return output;
     }
 
-    public IEnumerable<CodingSession> GetAll()
+    public IList<CodingSession> GetAll()
     {
         var output = _sessions.Select(Clone);
         Debug.WriteLine($"Retrieved {output.Count()} sessions");
-        return output;
+        return output.ToList();
     }
 
     public void Update(CodingSession session)
@@ -53,9 +53,9 @@ internal class MemoryStorage : IDataAccess
         Debug.WriteLine(deleted ? $"Deleted session {id}" : $"Failed to delete session {id}");
     }
 
-    public IEnumerable<CodingSession> CheckForOverlap(CodingSession session)
+    public IList<CodingSession> CheckForOverlap(CodingSession session)
     {
-        return _sessions.Where(cs => Overlaps(cs, session)).Select(Clone);
+        return _sessions.Where(cs => Overlaps(cs, session)).Select(Clone).ToList();
     }
 
     private static CodingSession Clone(CodingSession session)

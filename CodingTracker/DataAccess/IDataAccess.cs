@@ -6,8 +6,8 @@ internal interface IDataAccess
 {
     void Insert(CodingSession session);
     CodingSession? Get(int id);
-    IEnumerable<CodingSession> GetAll();
+    IList<CodingSession> GetAll();
     void Update(CodingSession session);
     void Delete(int id);
-    IEnumerable<CodingSession> CheckForOverlap(CodingSession session);
+    IList<CodingSession> CheckForOverlap(CodingSession session);
 }
