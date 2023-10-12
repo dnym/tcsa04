@@ -82,7 +82,7 @@ internal static class SessionLoggingScreen
 
             if (endTime == null)
             {
-                return @$"Input {currentInput} in the format {currentFormats},
+                return @$"Input {currentInput} in the format {currentFormats.ToUpper()},
 or press [Enter] to use the current {currentInput}: {currentData}
 Press [Esc] to cancel insertion.";
             }
@@ -154,7 +154,7 @@ Press [Esc] to cancel insertion.";
                         if (overlappingSessions.Any())
                         {
                             Console.Beep();
-                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to insert overlaps with the following sessions:\n{string.Join("\n", overlappingSessions.Select(s => $"  {s.StartTime} - {s.EndTime}"))}\n\nPress any key to cancel insertion and return to the main menu.");
+                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to insert,\n\t{newSession.StartTime} - {newSession.EndTime},\n\noverlaps with the following session{(overlappingSessions.Count>1?"s":"")}:\n{string.Join("\n", overlappingSessions.Select(s => $"\t{s.StartTime} - {s.EndTime}"))}\n\nPress any key to cancel insertion and return to the main menu.");
                             errorScreen.SetAnyKeyAction(() => errorScreen.ExitScreen());
                             errorScreen.Show();
                             screen.ExitScreen();
