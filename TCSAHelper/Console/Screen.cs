@@ -81,6 +81,8 @@ public class Screen
     public void Show()
     {
         _stayInScreen = true;
+        string userInput = "";
+        int userInputPosition = 0;
         while (_stayInScreen)
         {
             System.Console.Clear();
@@ -134,10 +136,10 @@ public class Screen
             }
             else
             {
+                System.Console.Write(userInput);
+                System.Console.SetCursorPosition(Math.Min(winWidth, bodyCursorLeft + userInputPosition), bodyCursorTop);
                 System.Console.CursorVisible = true;
                 var takeInput = true;
-                string userInput = "";
-                int userInputPosition = 0;
                 while (_stayInScreen && takeInput)
                 {
                     var pressedKeyInfo = System.Console.ReadKey(true);
@@ -145,6 +147,7 @@ public class Screen
                     if (_actions.TryGetValue(pressedKey, out Action? action))
                     {
                         action?.Invoke();
+                        takeInput = false;
                     }
                     else
                     {
