@@ -90,7 +90,9 @@ internal static class LogManagementScreen
             {
                 var i = result - 1;
                 var id = listNumbersToIds[i];
-                Debug.WriteLine($"User wants to see session with id {id}");
+                var editScreen = SingleLogViewScreen.Get(dataAccess, id);
+                editScreen.Show();
+                // TODO: Add a screen refresh function to Screen, and call it here. This will allow us to update the list after a modification or deletion.
             }
             else
             {
