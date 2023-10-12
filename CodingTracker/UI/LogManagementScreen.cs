@@ -15,14 +15,7 @@ internal static class LogManagementScreen
 
         string body(int _1, int _2)
         {
-            var sessions = dataAccess.GetAll().OrderBy(cs => cs.StartTime.Ticks).ToList();
-            var sb = new StringBuilder();
-            for (int i = 0; i < sessions.Count; i++)
-            {
-                var session = sessions[i];
-                sb.Append(i).Append(": ").Append(DurationString(session.Duration)).Append(" @ ").AppendLine(DateRangeString(session.StartTime, session.EndTime));
-            }
-            return sb.ToString();
+            return MakeListString(dataAccess);
         }
 
         var screen = new Screen(header: header, body: body);
@@ -30,10 +23,36 @@ internal static class LogManagementScreen
         return screen;
     }
 
+    private static string MakeListString(IDataAccess dataAccess, int skip = 0, int take = int.MaxValue)
+    {
+        var sessions = dataAccess.GetAll().OrderBy(cs => cs.StartTime.Ticks).Skip(skip).Take(take).ToList();
+        var numberWidth = sessions.Count.ToString().Length;
+        var durationStrings = sessions.Select(cs => DurationString(cs.Duration)).ToList();
+        var durationWidth = durationStrings.Max(ds => ds.Length);
+        var sb = new StringBuilder();
+        for (int i = 0; i < sessions.Count; i++)
+        {
+            var session = sessions[i];
+            sb.Append((i+1).ToString().PadLeft(numberWidth))
+                .Append(": ")
+                .Append(durationStrings[i].PadLeft(durationWidth))
+                .Append(" @ ")
+                .AppendLine(DateRangeString(session.StartTime, session.EndTime));
+        }
+        return sb.ToString();
+    }
+
     private static string DurationString(TimeSpan duration)
     {
         duration = TimeSpan.FromMinutes(Math.Round(duration.TotalMinutes));
-        return $"{duration.Hours}h{duration.Minutes}m";
+        if (duration.TotalMinutes < 60)
+        {
+            return $"{duration.Minutes}m";
+        }
+        else
+        {
+            return $"{duration.Hours}h{duration.Minutes}m";
+        }
     }
 
     private static string DateRangeString(DateTime d1, DateTime d2)
