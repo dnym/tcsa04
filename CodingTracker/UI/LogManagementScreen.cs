@@ -62,7 +62,7 @@ internal static class LogManagementScreen
 
         string body(int _1, int _2)
         {
-            var sessions = GetSubset(dataAccess, skip, listUsableHeight);
+            var sessions = dataAccess.GetAll(skip: skip, limit: listUsableHeight).ToList();
             listNumbersToIds = sessions.ConvertAll(cs => cs.Id).ToArray();
             const string prompt = "\nSelect a session to manage: ";
             return MakeListString(sessions) + prompt;
@@ -109,11 +109,6 @@ internal static class LogManagementScreen
         screen.AddAction(ConsoleKey.PageDown, pgDown);
         screen.SetPromptAction(handleUserInput);
         return screen;
-    }
-
-    private static List<CodingSession> GetSubset(IDataAccess dataAccess, int skip = 0, int take = int.MaxValue)
-    {
-        return dataAccess.GetAll().OrderBy(cs => cs.StartTime.Ticks).Skip(skip).Take(take).ToList();
     }
 
     private static string MakeListString(List<CodingSession> sessions)

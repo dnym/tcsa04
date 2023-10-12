@@ -1,5 +1,6 @@
 ﻿using CodingTracker.Models;
 using System.Diagnostics;
+using static CodingTracker.DataAccess.IDataAccess;
 
 namespace CodingTracker.DataAccess;
 
@@ -26,9 +27,17 @@ internal class MemoryStorage : IDataAccess
         return output;
     }
 
-    public IList<CodingSession> GetAll()
+    public IList<CodingSession> GetAll(Order order = Order.Ascending, int skip = 0, int limit = int.MaxValue)
     {
-        var output = _sessions.Select(Clone);
+        IEnumerable<CodingSession> output;
+        if (order == Order.Ascending)
+        {
+            output = _sessions.OrderBy(s => s.StartTime.Ticks).Skip(skip).Take(limit);
+        }
+        else
+        {
+            output = _sessions.OrderByDescending(s => s.StartTime.Ticks).Skip(skip).Take(limit);
+        }
         Debug.WriteLine($"Retrieved {output.Count()} sessions");
         return output.ToList();
     }
