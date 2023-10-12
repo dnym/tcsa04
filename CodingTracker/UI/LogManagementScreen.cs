@@ -27,7 +27,7 @@ internal static class LogManagementScreen
     {
         var sessions = dataAccess.GetAll().OrderBy(cs => cs.StartTime.Ticks).Skip(skip).Take(take).ToList();
         var numberWidth = sessions.Count.ToString().Length;
-        var durationStrings = sessions.Select(cs => DurationString(cs.Duration)).ToList();
+        var durationStrings = sessions.ConvertAll(cs => DurationString(cs.Duration));
         var durationWidth = durationStrings.Max(ds => ds.Length);
         var sb = new StringBuilder();
         for (int i = 0; i < sessions.Count; i++)
