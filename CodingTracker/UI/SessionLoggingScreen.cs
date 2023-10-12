@@ -180,6 +180,7 @@ Press [Esc] to cancel insertion.";
                 return date;
             }
         }
+        Console.Beep();
         return null;
     }
 
@@ -192,6 +193,7 @@ Press [Esc] to cancel insertion.";
                 return time;
             }
         }
+        Console.Beep();
         return null;
     }
 
