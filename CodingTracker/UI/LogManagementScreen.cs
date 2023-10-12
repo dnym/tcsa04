@@ -81,7 +81,7 @@ internal static class LogManagementScreen
         }
 
         var screen = new Screen(header: header, body: body, footer: footer);
-        screen.AddAction(ConsoleKey.D0, () => screen.ExitScreen());
+        screen.AddAction(ConsoleKey.Escape, () => screen.ExitScreen());
         screen.AddAction(ConsoleKey.PageUp, pgUp);
         screen.AddAction(ConsoleKey.PageDown, pgDown);
         return screen;
