@@ -12,6 +12,15 @@ public class Screen
 
     public Action ExitScreen => () => _stayInScreen = false;
 
+    /// <summary>
+    /// Create a screen.
+    /// </summary>
+    /// <param name="header">Function taking usable width and usable height and returning header text; characters and lines outside of these limits will be cut off.</param>
+    /// <param name="body">Function taking usable width and usable height and returning body text; characters and lines outside of these limits will be cut off.</param>
+    /// <param name="footer">Function taking usable width and usable height and returning footer text; characters and lines outside of these limits will be cut off.</param>
+    /// <param name="actions">Actions to be invoked upon key press.</param>
+    /// <param name="anyKeyAction">Action to be invoked upon key press not covered by the actions dictionary. The any-key action is ignored if the prompt handler is set.</param>
+    /// <param name="promptHandling">Action to invoke if the screen body is to end with a user input prompt; the user's input string is sent to this action. Note that any keys (e.g. letters) bound by the actions dictionary cannot be caught by the prompt; if needed, these may be removed while the prompt is shown.</param>
     public Screen(Func<int, int, string>? header = null, Func<int, int, string>? body = null, Func<int, int, string>? footer = null, IDictionary<ConsoleKey, Action>? actions = null, Action? anyKeyAction = null, Action<string>? promptHandling = null)
     {
         Func<int, int, string> nullFunc = (_, _) => "";
@@ -81,6 +90,7 @@ public class Screen
             if (!string.IsNullOrEmpty(header))
             {
                 // +2 for the header separator bar with empty line.
+                // TODO: Maybe generalize and make available to users the number of "extra" lines.
                 usableHeight = Math.Max(0, usableHeight - (CountLines(header) + 2));
             }
             var footer = CapStrings(usableWidth, usableHeight, _footer(usableWidth, usableHeight));
