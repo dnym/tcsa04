@@ -63,7 +63,7 @@ internal static class SingleLogViewScreen
             return $"Start: {start}\nEnd: {end}\nDuration: {duration}";
         }
 
-        var screen = new Screen(header: header, footer: footer, body: body);
+        var screen = new Screen(header: header, body: body, footer: footer);
         screen.AddAction(ConsoleKey.Escape, () => screen.ExitScreen());
         screen.AddAction(ConsoleKey.M, () =>
         {
