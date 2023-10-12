@@ -43,7 +43,7 @@ public class Screen
         _promptHandling = action;
     }
 
-    private static string CapStrings(int maxLines, int maxWidth, string text)
+    private static string CapStrings(int maxWidth, int maxLines, string text)
     {
         var lines = new List<string>();
         foreach (var line in text.Split('\n'))
@@ -75,20 +75,38 @@ public class Screen
         while (_stayInScreen)
         {
             System.Console.Clear();
-            // "- 4" is for having space and a bar between header and body, and between body and footer.
-            var (winWidth, winHeight) = (System.Console.WindowWidth - 4, System.Console.WindowHeight);
-            var header = CapStrings(winHeight, winWidth, _header(winWidth, winHeight));
-            var body = CapStrings(winHeight, winWidth, _body(winWidth, winHeight));
-            var footer = CapStrings(winHeight, winWidth, _footer(winWidth, winHeight));
+            var (winWidth, winHeight) = (System.Console.WindowWidth, System.Console.WindowHeight);
+            var (usableWidth, usableHeight) = (winWidth, winHeight);
+            var header = CapStrings(usableWidth, usableHeight, _header(usableWidth, usableHeight));
+            if (!string.IsNullOrEmpty(header))
+            {
+                // +2 for the header separator bar with empty line.
+                usableHeight = Math.Max(0, usableHeight - (CountLines(header) + 2));
+            }
+            var footer = CapStrings(usableWidth, usableHeight, _footer(usableWidth, usableHeight));
+            if (!string.IsNullOrEmpty(footer))
+            {
+                // +2 for the footer separator bar with empty line.
+                usableHeight = Math.Max(0, usableHeight - (CountLines(footer) + 2));
+            }
+            // Now body is informed of the usable space sans header and footer with separators.
+            var body = CapStrings(usableWidth, usableHeight, _body(usableWidth, usableHeight));
             var barLength = Math.Max(LongestLine(header), LongestLine(footer));
+
             System.Console.WriteLine(header);
-            System.Console.WriteLine(new string('=', barLength) + "\n");
+            if (!string.IsNullOrEmpty(header))
+            {
+                System.Console.WriteLine(new string('=', barLength) + "\n");
+            }
             System.Console.Write(body);
             var (bodyCursorLeft, bodyCursorTop) = (System.Console.CursorLeft, System.Console.CursorTop);
-            System.Console.SetCursorPosition(0, Math.Max(0, winHeight - CountLines(footer) - 1));
-            System.Console.WriteLine(new string('-', barLength));
-            System.Console.Write(footer);
-            System.Console.SetCursorPosition(bodyCursorLeft, bodyCursorTop);
+            if (!string.IsNullOrEmpty(footer))
+            {
+                System.Console.SetCursorPosition(0, Math.Max(0, winHeight - CountLines(footer) - 1));
+                System.Console.WriteLine(new string('-', barLength));
+                System.Console.Write(footer);
+                System.Console.SetCursorPosition(bodyCursorLeft, bodyCursorTop);
+            }
 
             if (_promptHandling == null)
             {
