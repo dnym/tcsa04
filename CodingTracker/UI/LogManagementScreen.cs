@@ -92,7 +92,10 @@ internal static class LogManagementScreen
                 var id = listNumbersToIds[i];
                 var editScreen = SingleLogViewScreen.Get(dataAccess, id);
                 editScreen.Show();
-                // TODO: Add a screen refresh function to Screen, and call it here. This will allow us to update the list after a modification or deletion.
+                if (dataAccess.Count() - skip <= 0)
+                {
+                    skip = Math.Max(0, skip - listUsableHeight);
+                }
             }
             else
             {
