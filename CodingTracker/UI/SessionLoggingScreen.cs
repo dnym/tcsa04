@@ -18,7 +18,7 @@ internal static class SessionLoggingScreen
         TimeOnly? startTime = null;
         DateOnly? endDate = null;
         TimeOnly? endTime = null;
-        DateTime now = DateTime.UtcNow;
+        DateTime now = DateTime.Now;
 
         string body(int _1, int _2)
         {
@@ -50,7 +50,7 @@ internal static class SessionLoggingScreen
         string footer(int _1, int _2)
         {
             // Like the body, the footer depends on what has been input so far. Here, we build a string which has the correct hint information.
-            now = DateTime.UtcNow;
+            now = DateTime.Now;
 
             string currentInput;
             string currentFormats;
