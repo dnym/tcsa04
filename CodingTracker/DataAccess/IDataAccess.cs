@@ -9,4 +9,5 @@ internal interface IDataAccess
     IEnumerable<CodingSession> GetAll();
     void Update(CodingSession session);
     void Delete(int id);
+    IEnumerable<CodingSession> CheckForOverlap(CodingSession session);
 }

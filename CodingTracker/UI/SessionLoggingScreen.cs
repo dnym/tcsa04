@@ -150,6 +150,16 @@ Press [Esc] to cancel insertion.";
                     screen.SetPromptAction(null);
                     screen.SetAnyKeyAction(() =>
                     {
+                        var overlappingSessions = dataAccess.CheckForOverlap(newSession);
+                        if (overlappingSessions.Any())
+                        {
+                            Console.Beep();
+                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to insert overlaps with the following sessions:\n{string.Join("\n", overlappingSessions.Select(s => $"  {s.StartTime} - {s.EndTime}"))}\n\nPress any key to cancel insertion and return to the main menu.");
+                            errorScreen.SetAnyKeyAction(() => errorScreen.ExitScreen());
+                            errorScreen.Show();
+                            screen.ExitScreen();
+                            return;
+                        }
                         dataAccess.Insert(newSession);
                         screen.ExitScreen();
                     });

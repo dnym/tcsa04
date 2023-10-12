@@ -53,6 +53,11 @@ internal class MemoryStorage : IDataAccess
         Debug.WriteLine(deleted ? $"Deleted session {id}" : $"Failed to delete session {id}");
     }
 
+    public IEnumerable<CodingSession> CheckForOverlap(CodingSession session)
+    {
+        return _sessions.Where(cs => Overlaps(cs, session)).Select(Clone);
+    }
+
     private static CodingSession Clone(CodingSession session)
     {
         return new CodingSession
@@ -61,5 +66,13 @@ internal class MemoryStorage : IDataAccess
             StartTime = session.StartTime,
             EndTime = session.EndTime
         };
+    }
+
+    private static bool Overlaps(CodingSession P, CodingSession C)
+    {
+        return (P.StartTime <= C.StartTime && C.StartTime <= P.EndTime)
+            || (P.StartTime <= C.EndTime && C.EndTime <= P.EndTime)
+            || (C.StartTime <= P.StartTime && P.StartTime <= C.EndTime)
+            || (C.StartTime <= P.EndTime && P.EndTime <= C.EndTime);
     }
 }
