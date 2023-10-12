@@ -33,6 +33,11 @@ internal class MemoryStorage : IDataAccess
         return output.ToList();
     }
 
+    public int Count()
+    {
+        return _sessions.Count;
+    }
+
     public void Update(CodingSession session)
     {
         var index = _sessions.FindIndex(s => s.Id == session.Id);
