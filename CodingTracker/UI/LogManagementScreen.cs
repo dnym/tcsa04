@@ -1,5 +1,6 @@
 ﻿using CodingTracker.DataAccess;
 using CodingTracker.Models;
+using System.Diagnostics;
 using System.Text;
 using TCSAHelper.Console;
 
@@ -12,6 +13,7 @@ internal static class LogManagementScreen
         const int headerHeight = 3;
         const int footerHeight = 5;// Actual height varies between 3-5, but we'll use a constant for regularity.
         const int promptHeight = 2;
+        int[] listNumbersToIds = Array.Empty<int>();
         int lastListUsableHeight = 0;
         int listUsableHeight = 0;
         int skip = 0;
@@ -61,7 +63,9 @@ internal static class LogManagementScreen
         string body(int _1, int _2)
         {
             var sessions = GetSubset(dataAccess, skip, listUsableHeight);
-            return MakeListString(sessions);
+            listNumbersToIds = sessions.ConvertAll(cs => cs.Id).ToArray();
+            const string prompt = "\nSelect a session to manage: ";
+            return MakeListString(sessions) + prompt;
         }
 
         void pgUp()
@@ -80,10 +84,25 @@ internal static class LogManagementScreen
             }
         }
 
+        void handleUserInput(string text)
+        {
+            if (int.TryParse(text, out int result) && result >= 1 && result <= listNumbersToIds.Length)
+            {
+                var i = result - 1;
+                var id = listNumbersToIds[i];
+                Debug.WriteLine($"User wants to see session with id {id}");
+            }
+            else
+            {
+                System.Console.Beep();
+            }
+        }
+
         var screen = new Screen(header: header, body: body, footer: footer);
         screen.AddAction(ConsoleKey.Escape, () => screen.ExitScreen());
         screen.AddAction(ConsoleKey.PageUp, pgUp);
         screen.AddAction(ConsoleKey.PageDown, pgDown);
+        screen.SetPromptAction(handleUserInput);
         return screen;
     }
 
