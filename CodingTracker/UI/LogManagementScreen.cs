@@ -8,29 +8,48 @@ internal static class LogManagementScreen
 {
     internal static Screen Get(IDataAccess dataAccess)
     {
+        const int headerHeight = 3;
+        const int footerHeight = 5;// Actual height varies between 3-5, but we'll use a constant for regularity.
+        const int promptHeight = 0;
+        int lastListUsableHeight = 0;
+        int listUsableHeight = 0;
         int skip = 0;
-        int lastTaken = 0;
 
-        static string header(int _1, int _2)
+        string header(int _, int usableHeight)
         {
-            return "Coding Sessions";
+            listUsableHeight = usableHeight - headerHeight - footerHeight - promptHeight;
+            if (listUsableHeight != lastListUsableHeight)
+            {
+                // If the list height changes, we reset the skip to keep it simple. What should otherwise happen is a bit unclear.
+                skip = 0;
+            }
+            lastListUsableHeight = listUsableHeight;
+
+            var currentPage = (skip/listUsableHeight) + 1;
+            var pages = (int)Math.Ceiling(dataAccess.Count()/(double)listUsableHeight);
+            if (pages > 1)
+            {
+                return $"Coding Sessions (page {currentPage}/{pages})";
+            }
+            else
+            {
+                return "Coding Sessions";
+            }
         }
 
-        string footer(int _, int usableHeight)
+        string footer(int _1, int _2)
         {
             const string escHint = "[Esc] to go back to the main menu.";
-            var footerHeight = 1 + 2;// +2 due to bar separator and empty line.
             var output = "Press ";
             if (skip > 0)
             {
                 output += "[PgUp] to go to the previous page,\n";
-                footerHeight++;
             }
-            if (dataAccess.Count() - skip > (usableHeight - footerHeight))
+            if (dataAccess.Count() - skip > listUsableHeight)
             {
                 output += "[PgDown] to go to the next page,\n";
             }
-            if (skip > 0 || dataAccess.Count() - skip > usableHeight)
+            if (skip > 0 || dataAccess.Count() - skip > listUsableHeight)
             {
                 output += "or ";
             }
@@ -38,25 +57,24 @@ internal static class LogManagementScreen
             return output;
         }
 
-        string body(int _, int usableHeight)
+        string body(int _1, int _2)
         {
-            lastTaken = usableHeight;
-            return MakeListString(dataAccess, skip, usableHeight);
+            return MakeListString(dataAccess, skip, listUsableHeight);
         }
 
         void pgUp()
         {
             if (skip > 0)
             {
-                skip = Math.Max(0 , skip - lastTaken);
+                skip = Math.Max(0 , skip - listUsableHeight);
             }
         }
 
         void pgDown()
         {
-            if (dataAccess.Count() - skip > lastTaken)
+            if (dataAccess.Count() - skip > listUsableHeight)
             {
-                skip += lastTaken;
+                skip += listUsableHeight;
             }
         }
 
