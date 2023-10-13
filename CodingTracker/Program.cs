@@ -7,7 +7,7 @@ internal static class Program
 {
     static void Main()
     {
-        IDataAccess dataAccess = new MemoryStorage();
+        IDataAccess dataAccess = new SqliteStorage("Data Source=CodingTracker.db");
         InsertDummySessions(dataAccess, 50);
         UI.MainMenu.Get(dataAccess).Show();
         Console.Clear();
