@@ -7,11 +7,12 @@ namespace CodingTracker.DataAccess;
 internal class MemoryStorage : IDataAccess
 {
     private readonly List<CodingSession> _sessions = new();
+    private int _lastId;
 
     public void Insert(CodingSession session)
     {
         session = Clone(session);
-        session.Id = _sessions.Count + 1;
+        session.Id = ++_lastId;
         _sessions.Add(session);
         Debug.WriteLine($"Inserted session {session.Id}: [{session.StartTime}] to [{session.EndTime}]");
     }
