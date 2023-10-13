@@ -13,7 +13,9 @@ public class Screen
     public Action ExitScreen => () => _stayInScreen = false;
 
     /// <summary>
-    /// Create a screen.
+    /// <para>Create a screen.</para>
+    /// <para>A screen works by writing to console first the header, then the footer, and lastly the body, which may or may not end with a user input prompt, and then listen for keys as supplied as actions.</para>
+    /// <para>As functions, the header, body, and footer can be made to depend on state unknown to this class. (Basically "if X, print this, if Y print that".)</para>
     /// </summary>
     /// <param name="header">Function taking usable width and usable height and returning header text; characters and lines outside of these limits will be cut off.</param>
     /// <param name="body">Function taking usable width and usable height and returning body text; characters and lines outside of these limits will be cut off.</param>
