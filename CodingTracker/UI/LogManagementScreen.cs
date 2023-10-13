@@ -1,7 +1,6 @@
 ﻿using CodingTracker.DataAccess;
 using CodingTracker.Models;
-using System.Diagnostics;
-using System.Text;
+using ConsoleTableExt;
 using TCSAHelper.Console;
 
 namespace CodingTracker.UI;
@@ -28,8 +27,8 @@ internal static class LogManagementScreen
             }
             lastListUsableHeight = listUsableHeight;
 
-            var currentPage = (skip/listUsableHeight) + 1;
-            var pages = (int)Math.Ceiling(dataAccess.Count()/(double)listUsableHeight);
+            var currentPage = (skip / ListItemsPerPage(listUsableHeight)) + 1;
+            var pages = (int)Math.Ceiling(dataAccess.Count() / (double)ListItemsPerPage(listUsableHeight));
             if (pages > 1)
             {
                 return $"Coding Sessions (page {currentPage}/{pages})";
@@ -48,11 +47,11 @@ internal static class LogManagementScreen
             {
                 output += "[PgUp] to go to the previous page,\n";
             }
-            if (dataAccess.Count() - skip > listUsableHeight)
+            if (dataAccess.Count() - skip > ListItemsPerPage(listUsableHeight))
             {
                 output += "[PgDown] to go to the next page,\n";
             }
-            if (skip > 0 || dataAccess.Count() - skip > listUsableHeight)
+            if (skip > 0 || dataAccess.Count() - skip > ListItemsPerPage(listUsableHeight))
             {
                 output += "or ";
             }
@@ -63,7 +62,7 @@ internal static class LogManagementScreen
         string body(int _1, int _2)
         {
             // TODO: Caching? Currently, we're getting all sessions every time we refresh the screen, which is suboptimal (but no problem with SQLite). But if we cache, we need to invalidate the cache when the user adds, modifies, or deletes a session.
-            var sessions = dataAccess.GetAll(skip: skip, limit: listUsableHeight).ToList();
+            var sessions = dataAccess.GetAll(skip: skip, limit: ListItemsPerPage(listUsableHeight)).ToList();
             listNumbersToIds = sessions.ConvertAll(cs => cs.Id).ToArray();
             const string prompt = "\nSelect a session to manage: ";
             return MakeListString(sessions) + prompt;
@@ -73,15 +72,15 @@ internal static class LogManagementScreen
         {
             if (skip > 0)
             {
-                skip = Math.Max(0 , skip - listUsableHeight);
+                skip = Math.Max(0, skip - ListItemsPerPage(listUsableHeight));
             }
         }
 
         void pgDown()
         {
-            if (dataAccess.Count() - skip > listUsableHeight)
+            if (dataAccess.Count() - skip > ListItemsPerPage(listUsableHeight))
             {
-                skip += listUsableHeight;
+                skip += ListItemsPerPage(listUsableHeight);
             }
         }
 
@@ -95,7 +94,7 @@ internal static class LogManagementScreen
                 editScreen.Show();
                 if (dataAccess.Count() - skip <= 0)
                 {
-                    skip = Math.Max(0, skip - listUsableHeight);
+                    skip = Math.Max(0, skip - ListItemsPerPage(listUsableHeight));
                 }
             }
             else
@@ -112,22 +111,31 @@ internal static class LogManagementScreen
         return screen;
     }
 
+    private static int ListItemsPerPage(int pageHeight)
+    {
+        // There's a top and a bottom and a divider between each item, and a header row.
+        return (int)Math.Floor((pageHeight - 3d) / 2d);
+    }
+
     private static string MakeListString(List<CodingSession> sessions)
     {
-        var numberWidth = sessions.Count.ToString().Length;
-        var durationStrings = sessions.ConvertAll(cs => DurationString(cs.Duration));
-        var durationWidth = durationStrings.Max(ds => ds.Length);
-        var sb = new StringBuilder();
+        var tableData = new List<List<object>>();
         for (int i = 0; i < sessions.Count; i++)
         {
             var session = sessions[i];
-            sb.Append((i+1).ToString().PadLeft(numberWidth))
-                .Append(": ")
-                .Append(durationStrings[i].PadLeft(durationWidth))
-                .Append(" @ ")
-                .AppendLine(DateRangeString(session.StartTime, session.EndTime));
+            tableData.Add(new List<object>
+            {
+                i + 1,
+                session.StartTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
+                session.EndTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
+                DurationString(session.Duration),
+            });
         }
-        return sb.ToString();
+        return ConsoleTableBuilder
+            .From(tableData)
+            .WithColumn("No.", "Start", "End", "Duration")
+            .WithFormat(ConsoleTableBuilderFormat.Alternative)
+            .Export().ToString();
     }
 
     private static string DurationString(TimeSpan duration)
@@ -140,20 +148,6 @@ internal static class LogManagementScreen
         else
         {
             return $"{duration.Hours}h{duration.Minutes}m";
-        }
-    }
-
-    private static string DateRangeString(DateTime d1, DateTime d2)
-    {
-        d1 = d1.ToLocalTime();
-        d2 = d2.ToLocalTime();
-        if (DateOnly.FromDateTime(d1) != DateOnly.FromDateTime(d2))
-        {
-            return $"{d1:yyyy-MM-dd}, from {d1:HH:mm:ss} to {d2:HH:mm:ss} on {d2:yyyy-MM-dd}";
-        }
-        else
-        {
-            return $"{d1:yyyy-MM-dd}, from {d1:HH:mm:ss} to {d2:HH:mm:ss}";
         }
     }
 }
