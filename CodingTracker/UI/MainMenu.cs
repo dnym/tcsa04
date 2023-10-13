@@ -14,8 +14,11 @@ internal static class MainMenu
 0. Quit",
             footer: (_, _) => "Press a number to select.");
         screen.AddAction(ConsoleKey.D1, () => SessionLoggingScreen.Get(dataAccess).Show());
+        screen.AddAction(ConsoleKey.NumPad1, () => SessionLoggingScreen.Get(dataAccess).Show());
         screen.AddAction(ConsoleKey.D2, () => LogManagementScreen.Get(dataAccess).Show());
+        screen.AddAction(ConsoleKey.NumPad2, () => LogManagementScreen.Get(dataAccess).Show());
         screen.AddAction(ConsoleKey.D0, () => screen.ExitScreen());
+        screen.AddAction(ConsoleKey.NumPad0, () => screen.ExitScreen());
         return screen;
     }
 }
