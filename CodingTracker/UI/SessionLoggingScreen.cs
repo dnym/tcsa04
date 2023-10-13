@@ -8,6 +8,10 @@ internal static class SessionLoggingScreen
 {
     internal static Screen Get(IDataAccess dataAccess, CodingSession? codingSession = null)
     {
+        // If codingSession is null, the screen is for creating a new session. Otherwise, it is for modifying an existing session.
+        // The body is made to ask one of four questions, depending on which info has been received through the prompt handler.
+        // The footer is made to give state-based hints about what to input.
+        // A prompt handling action parses the user's input and calls the data access layer to insert/update the session.
         const string mainDateFormat = "yyyy-MM-dd";
         string[] dateFormats = { mainDateFormat };
         const string mainTimeFormat = "HH:mm:ss";

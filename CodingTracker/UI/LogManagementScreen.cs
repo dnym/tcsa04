@@ -9,6 +9,7 @@ internal static class LogManagementScreen
 {
     internal static Screen Get(IDataAccess dataAccess)
     {
+        // Session list screen. Since the screen header function is called first, it calculates the console height available for the list, and this value is used by the footer and body functions.
         const int headerHeight = 3;
         const int footerHeight = 5;// Actual height varies between 3-5, but we'll use a constant for regularity.
         const int promptHeight = 2;
@@ -126,6 +127,7 @@ internal static class LogManagementScreen
             tableData.Add(new List<object>
             {
                 i + 1,
+                // TODO: Centralize the time formats.
                 session.StartTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
                 session.EndTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
                 DurationString(session.Duration),
