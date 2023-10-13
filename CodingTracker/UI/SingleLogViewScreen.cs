@@ -45,7 +45,8 @@ internal static class SingleLogViewScreen
         string body(int _1, int _2)
         {
             string start = session.StartTime.ToString("yyyy-MM-dd HH:mm:ss");
-            string end = session.EndTime.ToString("yyyy-MM-dd HH:mm:ss");
+            string start = session.StartTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+            string end = session.EndTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
             string duration;
             if (session.Duration.TotalHours >= 1)
             {

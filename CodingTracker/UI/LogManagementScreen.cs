@@ -144,6 +144,8 @@ internal static class LogManagementScreen
 
     private static string DateRangeString(DateTime d1, DateTime d2)
     {
+        d1 = d1.ToLocalTime();
+        d2 = d2.ToLocalTime();
         if (DateOnly.FromDateTime(d1) != DateOnly.FromDateTime(d2))
         {
             return $"{d1:yyyy-MM-dd}, from {d1:HH:mm:ss} to {d2:HH:mm:ss} on {d2:yyyy-MM-dd}";
