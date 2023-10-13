@@ -26,6 +26,10 @@ internal static class Program
             var startDate = new DateTime(earliestStartDate + (long)(random.NextDouble() * greatestDiff));
             var randomDuration = new TimeSpan((long)(random.NextDouble() * (longestSessionLength - shortestSessionLength)) + shortestSessionLength);
             var endDate = startDate + randomDuration;
+            if (endDate > DateTime.UtcNow)
+            {
+                endDate = DateTime.UtcNow;
+            }
             var session = new CodingSession()
             {
                 StartTime = startDate,
