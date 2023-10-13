@@ -1,6 +1,4 @@
 ﻿using CodingTracker.DataAccess;
-using CodingTracker.Models;
-using System.Diagnostics;
 using TCSAHelper.Console;
 
 namespace CodingTracker.UI;
@@ -16,7 +14,7 @@ internal static class SingleLogViewScreen
         }
         else
         {
-            return GetScreen(dataAccess, session);
+            return GetScreen(dataAccess, id);
         }
     }
 
@@ -31,7 +29,7 @@ internal static class SingleLogViewScreen
         return screen;
     }
 
-    private static Screen GetScreen(IDataAccess dataAccess, CodingSession session)
+    private static Screen GetScreen(IDataAccess dataAccess, int id)
     {
         static string header(int _1, int _2)
         {
@@ -44,7 +42,7 @@ internal static class SingleLogViewScreen
 
         string body(int _1, int _2)
         {
-            string start = session.StartTime.ToString("yyyy-MM-dd HH:mm:ss");
+            var session = dataAccess.Get(id)!;
             string start = session.StartTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
             string end = session.EndTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
             string duration;
@@ -68,11 +66,13 @@ internal static class SingleLogViewScreen
         screen.AddAction(ConsoleKey.Escape, () => screen.ExitScreen());
         screen.AddAction(ConsoleKey.M, () =>
         {
-            Debug.Write($"User wants to modify session with id {session.Id}");
+            var session = dataAccess.Get(id)!;
+            var modScreen = SessionLoggingScreen.Get(dataAccess, session);
+            modScreen.Show();
         });
         screen.AddAction(ConsoleKey.D, () =>
         {
-            dataAccess.Delete(session.Id);
+            dataAccess.Delete(id);
             screen.ExitScreen();
         });
         return screen;

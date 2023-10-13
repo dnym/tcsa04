@@ -6,9 +6,8 @@ namespace CodingTracker.UI;
 
 internal static class SessionLoggingScreen
 {
-    internal static Screen Get(IDataAccess dataAccess)
+    internal static Screen Get(IDataAccess dataAccess, CodingSession? codingSession = null)
     {
-        const string header = "Log Coding Session";
         const string mainDateFormat = "yyyy-MM-dd";
         string[] dateFormats = { mainDateFormat };
         const string mainTimeFormat = "HH:mm:ss";
@@ -19,6 +18,18 @@ internal static class SessionLoggingScreen
         DateOnly? endDate = null;
         TimeOnly? endTime = null;
         DateTime now = DateTime.Now;
+
+        string header(int _1, int _2)
+        {
+            if (codingSession == null)
+            {
+                return "Log Coding Session";
+            }
+            else
+            {
+                return "Modifying Coding Session";
+            }
+        }
 
         string body(int _1, int _2)
         {
@@ -51,6 +62,8 @@ internal static class SessionLoggingScreen
         {
             // Like the body, the footer depends on what has been input so far. Here, we build a string which has the correct hint information.
             now = DateTime.Now;
+            var hintStart = codingSession?.StartTime.ToLocalTime() ?? now;
+            var hintEnd = codingSession?.EndTime.ToLocalTime() ?? now;
 
             string currentInput;
             string currentFormats;
@@ -59,40 +72,40 @@ internal static class SessionLoggingScreen
             {
                 currentInput = "date";
                 currentFormats = string.Join(" or ", dateFormats);
-                currentData = now.ToString(mainDateFormat);
+                currentData = hintStart.ToString(mainDateFormat);
             }
             else if (startTime == null)
             {
                 currentInput = "time";
                 currentFormats = string.Join(" or ", timeFormats);
-                currentData = now.ToString(mainTimeFormat);
+                currentData = hintStart.ToString(mainTimeFormat);
             }
             else if (endDate == null)
             {
                 currentInput = "date";
                 currentFormats = string.Join(" or ", dateFormats);
-                currentData = now.ToString(mainDateFormat);
+                currentData = hintEnd.ToString(mainDateFormat);
             }
             else
             {
                 currentInput = "time";
                 currentFormats = string.Join(" or ", timeFormats);
-                currentData = now.ToString(mainTimeFormat);
+                currentData = hintEnd.ToString(mainTimeFormat);
             }
 
             if (endTime == null)
             {
                 return @$"Input {currentInput} in the format {currentFormats.ToUpper()},
-or press [Enter] to use the current {currentInput}: {currentData}
-Press [Esc] to cancel insertion.";
+or press [Enter] to use the {(codingSession==null?"current":"stored")} {currentInput}: {currentData}
+Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}.";
             }
             else
             {
-                return "Press [Esc] to cancel insertion,\nor any other key to confirm.";
+                return $"Press [Esc] to cancel {(codingSession==null?"insertion":"modification")},\nor any other key to confirm.";
             }
         }
 
-        var screen = new Screen(header: (_, _) => header, body: body, footer: footer);
+        var screen = new Screen(header: header, body: body, footer: footer);
 
         void promptHandler(string text)
         {
@@ -101,7 +114,7 @@ Press [Esc] to cancel insertion.";
             {
                 if (string.IsNullOrEmpty(text))
                 {
-                    startDate = DateOnly.FromDateTime(now);
+                    startDate = DateOnly.FromDateTime(codingSession?.StartTime.ToLocalTime() ?? now);
                 }
                 else
                 {
@@ -112,7 +125,7 @@ Press [Esc] to cancel insertion.";
             {
                 if (string.IsNullOrEmpty(text))
                 {
-                    startTime = TimeOnly.FromDateTime(now);
+                    startTime = TimeOnly.FromDateTime(codingSession?.StartTime.ToLocalTime() ?? now);
                 }
                 else
                 {
@@ -123,7 +136,7 @@ Press [Esc] to cancel insertion.";
             {
                 if (string.IsNullOrEmpty(text))
                 {
-                    endDate = DateOnly.FromDateTime(now);
+                    endDate = DateOnly.FromDateTime(codingSession?.EndTime.ToLocalTime() ?? now);
                 }
                 else
                 {
@@ -134,7 +147,7 @@ Press [Esc] to cancel insertion.";
             {
                 if (string.IsNullOrEmpty(text))
                 {
-                    endTime = TimeOnly.FromDateTime(now);
+                    endTime = TimeOnly.FromDateTime(codingSession?.EndTime.ToLocalTime() ?? now);
                 }
                 else
                 {
@@ -144,6 +157,7 @@ Press [Esc] to cancel insertion.";
                 {
                     var newSession = new CodingSession()
                     {
+                        Id = codingSession?.Id ?? -1,
                         StartTime = CombineDateTime(startDate.Value, startTime.Value),
                         EndTime = CombineDateTime(endDate.Value, endTime.Value)
                     };
@@ -151,16 +165,27 @@ Press [Esc] to cancel insertion.";
                     screen.SetAnyKeyAction(() =>
                     {
                         var overlappingSessions = dataAccess.CheckForOverlap(newSession);
+                        if (codingSession != null)
+                        {
+                            overlappingSessions = overlappingSessions.Where(cs => cs.Id != codingSession.Id).ToList();
+                        }
                         if (overlappingSessions.Any())
                         {
                             Console.Beep();
-                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to insert,\n\t{newSession.StartTime} - {newSession.EndTime},\n\noverlaps with the following session{(overlappingSessions.Count>1?"s":"")}:\n{string.Join("\n", overlappingSessions.Select(s => $"\t{s.StartTime} - {s.EndTime}"))}\n\nPress any key to cancel insertion and return to the main menu.");
+                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to {(codingSession==null?"insert":"modify")},\n\t{newSession.StartTime} - {newSession.EndTime},\n\n{(codingSession == null ? "" : "now ")}overlaps with the following session{(overlappingSessions.Count>1?"s":"")}:\n{string.Join("\n", overlappingSessions.Select(s => $"\t{s.StartTime} - {s.EndTime}"))}\n\nPress any key to cancel insertion and return to the main menu.");
                             errorScreen.SetAnyKeyAction(() => errorScreen.ExitScreen());
                             errorScreen.Show();
                             screen.ExitScreen();
                             return;
                         }
-                        dataAccess.Insert(newSession);
+                        if (codingSession == null)
+                        {
+                            dataAccess.Insert(newSession);
+                        }
+                        else
+                        {
+                            dataAccess.Update(newSession);
+                        }
                         screen.ExitScreen();
                     });
                 }
