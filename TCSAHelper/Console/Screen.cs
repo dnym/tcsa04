@@ -65,7 +65,7 @@ public class Screen
             }
             else if (line.Length > maxWidth)
             {
-                string l = line[..(maxWidth-3)] + "...";
+                string l = line[..(maxWidth - 3)] + "...";
                 lines.Add(l);
             }
             else

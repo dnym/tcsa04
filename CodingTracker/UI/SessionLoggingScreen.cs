@@ -100,12 +100,12 @@ internal static class SessionLoggingScreen
             if (endTime == null)
             {
                 return @$"Input {currentInput} in the format {currentFormats.ToUpper()},
-or press [Enter] to use the {(codingSession==null?"current":"stored")} {currentInput}: {currentData}
+or press [Enter] to use the {(codingSession == null ? "current" : "stored")} {currentInput}: {currentData}
 Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}.";
             }
             else
             {
-                return $"Press [Esc] to cancel {(codingSession==null?"insertion":"modification")},\nor any other key to confirm.";
+                return $"Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")},\nor any other key to confirm.";
             }
         }
 
@@ -176,7 +176,7 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
                         if (overlappingSessions.Any())
                         {
                             Console.Beep();
-                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to {(codingSession==null?"insert":"modify")},\n\t{newSession.StartTime.ToLocalTime()} - {newSession.EndTime.ToLocalTime()},\n\n{(codingSession == null ? "" : "now ")}overlaps with the following session{(overlappingSessions.Count>1?"s":"")}:\n{string.Join("\n", overlappingSessions.Select(s => $"\t{s.StartTime.ToLocalTime()} - {s.EndTime.ToLocalTime()}"))}\n\nPress any key to cancel insertion and return to the main menu.");
+                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to {(codingSession == null ? "insert" : "modify")},\n\t{newSession.StartTime.ToLocalTime()} - {newSession.EndTime.ToLocalTime()},\n\n{(codingSession == null ? "" : "now ")}overlaps with the following session{(overlappingSessions.Count > 1 ? "s" : "")}:\n{string.Join("\n", overlappingSessions.Select(s => $"\t{s.StartTime.ToLocalTime()} - {s.EndTime.ToLocalTime()}"))}\n\nPress any key to cancel insertion and return to the main menu.");
                             errorScreen.SetAnyKeyAction(() => errorScreen.ExitScreen());
                             errorScreen.Show();
                             screen.ExitScreen();
