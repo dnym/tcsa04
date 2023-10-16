@@ -32,29 +32,11 @@ ORDER BY ""starttime"" ASC;";
         _connectionString = connectionString;
 
         using var connection = new SqliteConnection(_connectionString);
-
-        try
-        {
-            connection.Open();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to create table: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        TryOrDie(connection.Open, "create table");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = _createTableSql;
-
-        try
-        {
-            cmd.ExecuteNonQuery();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to create table: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        TryOrDie(() => cmd.ExecuteNonQuery(), "create table");
 
         connection.Close();
     }
@@ -62,56 +44,28 @@ ORDER BY ""starttime"" ASC;";
     public void Insert(CodingSession session)
     {
         using var connection = new SqliteConnection(_connectionString);
-
-        try
-        {
-            connection.Open();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to insert session: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        TryOrDie(connection.Open, "insert session");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = _insertSessionSql;
         cmd.Parameters.AddWithValue("@starttime", session.StartTime.ToString("O"));
         cmd.Parameters.AddWithValue("@endtime", session.EndTime.ToString("O"));
-
-        try
-        {
-            cmd.ExecuteNonQuery();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to insert session: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        TryOrDie(() => cmd.ExecuteNonQuery(), "insert session");
 
         connection.Close();
     }
 
     public CodingSession? Get(int id)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        CodingSession? output = null;
 
-        try
-        {
-            connection.Open();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to get session with id={id}: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        using var connection = new SqliteConnection(_connectionString);
+        TryOrDie(connection.Open, $"get session with id={id}");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = _selectSessionSql;
         cmd.Parameters.AddWithValue("@id", id);
-
-        CodingSession? output = null;
-        try
-        {
+        TryOrDie(() => {
             using var reader = cmd.ExecuteReader();
             reader.Read();
             if (reader.HasRows)
@@ -126,17 +80,7 @@ ORDER BY ""starttime"" ASC;";
                     EndTime = DateTime.ParseExact(endTime, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)
                 };
             }
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to get session with id={id}: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
-        catch (FormatException ex)
-        {
-            Console.WriteLine($"Session with id={id} has bad data: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        }, $"get session with id={id}", $"Session with id={id} has bad data");
 
         connection.Close();
         return output;
@@ -144,26 +88,16 @@ ORDER BY ""starttime"" ASC;";
 
     public IList<CodingSession> GetAll(IDataAccess.Order order = IDataAccess.Order.Ascending, int skip = 0, int limit = int.MaxValue)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        var output = new List<CodingSession>();
 
-        try
-        {
-            connection.Open();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to get sessions: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        using var connection = new SqliteConnection(_connectionString);
+        TryOrDie(connection.Open, "get sessions");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = _selectSubsetSql.Replace("@order", order == IDataAccess.Order.Ascending ? "ASC" : "DESC");
         cmd.Parameters.AddWithValue("@limit", limit);
         cmd.Parameters.AddWithValue("@skip", skip);
-
-        var output = new List<CodingSession>();
-        try
-        {
+        TryOrDie(() => {
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -174,17 +108,7 @@ ORDER BY ""starttime"" ASC;";
                     EndTime = DateTime.ParseExact(reader.GetString(2), "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)
                 });
             }
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to get sessions: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
-        catch (FormatException ex)
-        {
-            Console.WriteLine($"Session has bad data: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        }, "get sessions", "Session has bad data");
 
         connection.Close();
         return output;
@@ -192,24 +116,14 @@ ORDER BY ""starttime"" ASC;";
 
     public int Count()
     {
-        using var connection = new SqliteConnection(_connectionString);
+        var output = 0;
 
-        try
-        {
-            connection.Open();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to count sessions: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        using var connection = new SqliteConnection(_connectionString);
+        TryOrDie(connection.Open, "count sessions");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = _countSessionsSql;
-
-        var output = 0;
-        try
-        {
+        TryOrDie(() => {
             if (cmd.ExecuteScalar() is long result)
             {
                 output = (int)result;
@@ -219,12 +133,7 @@ ORDER BY ""starttime"" ASC;";
                 Console.WriteLine("Failed to count sessions!\nAborting!");
                 Environment.Exit(1);
             }
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to count sessions: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        }, "count sessions");
 
         connection.Close();
         return output;
@@ -233,32 +142,14 @@ ORDER BY ""starttime"" ASC;";
     public void Update(CodingSession session)
     {
         using var connection = new SqliteConnection(_connectionString);
-
-        try
-        {
-            connection.Open();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to update session with id={session.Id}: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        TryOrDie(connection.Open, $"update session with id={session.Id}");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = _updateSessionSql;
         cmd.Parameters.AddWithValue("@id", session.Id);
         cmd.Parameters.AddWithValue("@starttime", session.StartTime.ToString("O"));
         cmd.Parameters.AddWithValue("@endtime", session.EndTime.ToString("O"));
-
-        try
-        {
-            cmd.ExecuteNonQuery();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to update session with id={session.Id}: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        TryOrDie(() => cmd.ExecuteNonQuery(), $"update session with id={session.Id}");
 
         connection.Close();
     }
@@ -266,55 +157,28 @@ ORDER BY ""starttime"" ASC;";
     public void Delete(int id)
     {
         using var connection = new SqliteConnection(_connectionString);
-
-        try
-        {
-            connection.Open();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to delete session with id={id}: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        TryOrDie(connection.Open, $"delete session with id={id}");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = _deleteSessionSql;
         cmd.Parameters.AddWithValue("@id", id);
-
-        try
-        {
-            cmd.ExecuteNonQuery();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to delete session with id={id}: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        TryOrDie(() => cmd.ExecuteNonQuery(), $"delete session with id={id}");
 
         connection.Close();
     }
 
     public IList<CodingSession> CheckForOverlap(CodingSession session)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        var output = new List<CodingSession>();
 
-        try
-        {
-            connection.Open();
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to get overlapping sessions: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        using var connection = new SqliteConnection(_connectionString);
+        TryOrDie(connection.Open, "get overlapping sessions");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = _overlapTestSql;
         cmd.Parameters.AddWithValue("@starttime", session.StartTime.ToString("O"));
         cmd.Parameters.AddWithValue("@endtime", session.EndTime.ToString("O"));
-
-        var output = new List<CodingSession>();
-        try
+        TryOrDie(() =>
         {
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -326,19 +190,42 @@ ORDER BY ""starttime"" ASC;";
                     EndTime = DateTime.ParseExact(reader.GetString(2), "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)
                 });
             }
-        }
-        catch (SqliteException ex)
-        {
-            Console.WriteLine($"Failed to get overlapping sessions: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
-        catch (FormatException ex)
-        {
-            Console.WriteLine($"Session has bad data: {ex.Message}\nAborting!");
-            Environment.Exit(1);
-        }
+        }, "get overlapping sessions", "Session has bad data");
 
         connection.Close();
         return output;
+    }
+
+    private static void TryOrDie(Action action, string purpose, string? formatError = null)
+    {
+        if (formatError == null)
+        {
+            try
+            {
+                action.Invoke();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"Failed to {purpose}: {ex.Message}\nAborting!");
+                Environment.Exit(1);
+            }
+        }
+        else
+        {
+            try
+            {
+                action.Invoke();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"Failed to {purpose}: {ex.Message}\nAborting!");
+                Environment.Exit(1);
+            }
+            catch (FormatException ex)
+            {
+                Console.WriteLine($"{formatError}: {ex.Message}\nAborting!");
+                Environment.Exit(1);
+            }
+        }
     }
 }

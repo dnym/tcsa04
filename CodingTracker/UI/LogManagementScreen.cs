@@ -62,6 +62,7 @@ internal static class LogManagementScreen
 
         string body(int _1, int _2)
         {
+            const string prompt = "\nSelect a session to manage: ";
             if (dataAccess.Count() == 0)
             {
                 return "There are no logged coding sessions yet.";
@@ -69,7 +70,6 @@ internal static class LogManagementScreen
             // TODO: Caching? Currently, we're getting all sessions every time we refresh the screen, which is suboptimal (but no problem with SQLite). But if we cache, we need to invalidate the cache when the user adds, modifies, or deletes a session.
             var sessions = dataAccess.GetAll(skip: skip, limit: ListItemsPerPage(listUsableHeight)).ToList();
             listNumbersToIds = sessions.ConvertAll(cs => cs.Id).ToArray();
-            const string prompt = "\nSelect a session to manage: ";
             return MakeListString(sessions) + prompt;
         }
 
@@ -110,7 +110,7 @@ internal static class LogManagementScreen
             }
             else
             {
-                System.Console.Beep();
+                Console.Beep();
             }
         }
         screen.AddAction(ConsoleKey.Escape, () => screen.ExitScreen());

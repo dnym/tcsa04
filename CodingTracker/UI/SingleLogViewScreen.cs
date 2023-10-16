@@ -1,4 +1,5 @@
 ﻿using CodingTracker.DataAccess;
+using CodingTracker.Models;
 using TCSAHelper.Console;
 
 namespace CodingTracker.UI;
@@ -35,6 +36,7 @@ internal static class SingleLogViewScreen
         {
             return "Viewing Coding Session";
         }
+
         static string footer(int _1, int _2)
         {
             return "Press [M] to modify the session,\n[D] to delete,\nor [Esc] to go back to the main menu.";
@@ -45,20 +47,7 @@ internal static class SingleLogViewScreen
             var session = dataAccess.Get(id)!;
             string start = session.StartTime.ToLocalTime().ToString(Program.mainFullFormat);
             string end = session.EndTime.ToLocalTime().ToString(Program.mainFullFormat);
-            string duration;
-            if (session.Duration.TotalHours >= 1)
-            {
-                duration = $"{(int)session.Duration.TotalHours}h {session.Duration.Minutes}m {(int)Math.Round(session.Duration.TotalSeconds % 60)}s";
-            }
-            else if (session.Duration.TotalMinutes >= 1)
-            {
-                duration = $"{session.Duration.Minutes}m {(int)Math.Round(session.Duration.TotalSeconds % 60)}s";
-            }
-            else
-            {
-                duration = $"{(int)Math.Round(session.Duration.TotalSeconds)}s";
-            }
-
+            string duration = DurationString(session);
             return $"Start: {start}\nEnd: {end}\nDuration: {duration}";
         }
 
@@ -76,5 +65,21 @@ internal static class SingleLogViewScreen
             screen.ExitScreen();
         });
         return screen;
+    }
+
+    private static string DurationString(CodingSession session)
+    {
+        if (session.Duration.TotalHours >= 1)
+        {
+            return $"{(int)session.Duration.TotalHours}h {session.Duration.Minutes}m {(int)Math.Round(session.Duration.TotalSeconds % 60)}s";
+        }
+        else if (session.Duration.TotalMinutes >= 1)
+        {
+            return $"{session.Duration.Minutes}m {(int)Math.Round(session.Duration.TotalSeconds % 60)}s";
+        }
+        else
+        {
+            return $"{(int)Math.Round(session.Duration.TotalSeconds)}s";
+        }
     }
 }

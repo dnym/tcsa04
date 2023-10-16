@@ -2,6 +2,9 @@
 
 public class Screen
 {
+    private const char _headerBar = '=';
+    private const char _footerBar = '-';
+    private const string _widthEllipsis = "...";
     private readonly Func<int, int, string> _header;
     private readonly Func<int, int, string> _body;
     private readonly Func<int, int, string> _footer;
@@ -65,7 +68,7 @@ public class Screen
             }
             else if (line.Length > maxWidth)
             {
-                string l = line[..(maxWidth - 3)] + "...";
+                string l = line[..(maxWidth - _widthEllipsis.Length)] + _widthEllipsis;
                 lines.Add(l);
             }
             else
@@ -82,6 +85,10 @@ public class Screen
 
     public void Show()
     {
+        // Simple enough logic: a loop which clears screen, writes header, writes footer, writes body, and listens for and acts on single keys and/or shows a prompt for the user.
+        // The reason for writing header and footer first is to know the height available to the body.
+        // When listening to keys, any single key resets the loop.
+        // Note that when showing a prompt, that's an inner loop, although temporary input is stored between loop iterations.
         _stayInScreen = true;
         string userInput = "";
         int userInputPosition = 0;
@@ -90,6 +97,7 @@ public class Screen
             System.Console.Clear();
             var (winWidth, winHeight) = (System.Console.WindowWidth, System.Console.WindowHeight);
             var (usableWidth, usableHeight) = (winWidth, winHeight);
+
             var header = CapStrings(usableWidth, usableHeight, _header(usableWidth, usableHeight));
             if (!string.IsNullOrEmpty(header))
             {
@@ -97,12 +105,14 @@ public class Screen
                 // TODO: Maybe generalize and make available to users the number of "extra" lines.
                 usableHeight = Math.Max(0, usableHeight - (CountLines(header) + 2));
             }
+
             var footer = CapStrings(usableWidth, usableHeight, _footer(usableWidth, usableHeight));
             if (!string.IsNullOrEmpty(footer))
             {
                 // +2 for the footer separator bar with empty line.
                 usableHeight = Math.Max(0, usableHeight - (CountLines(footer) + 2));
             }
+
             // Now body is informed of the usable space sans header and footer with separators.
             var body = CapStrings(usableWidth, usableHeight, _body(usableWidth, usableHeight));
             var barLength = Math.Max(LongestLine(header), LongestLine(footer));
@@ -110,14 +120,14 @@ public class Screen
             System.Console.WriteLine(header);
             if (!string.IsNullOrEmpty(header))
             {
-                System.Console.WriteLine(new string('=', barLength) + "\n");
+                System.Console.WriteLine(new string(_headerBar, barLength) + "\n");
             }
             System.Console.Write(body);
             var (bodyCursorLeft, bodyCursorTop) = (System.Console.CursorLeft, System.Console.CursorTop);
             if (!string.IsNullOrEmpty(footer))
             {
                 System.Console.SetCursorPosition(0, Math.Max(0, winHeight - CountLines(footer) - 1));
-                System.Console.WriteLine(new string('-', barLength));
+                System.Console.WriteLine(new string(_footerBar, barLength));
                 System.Console.Write(footer);
                 System.Console.SetCursorPosition(bodyCursorLeft, bodyCursorTop);
             }
@@ -153,6 +163,7 @@ public class Screen
                     }
                     else
                     {
+                        // This section handles the user's cursor movement and text editing.
                         int newCursorLeft = bodyCursorLeft;
                         int newCursorTop = bodyCursorTop;
                         switch (pressedKey)
@@ -250,8 +261,8 @@ public class Screen
                         else
                         {
                             System.Console.CursorVisible = false;
-                            System.Console.SetCursorPosition(winWidth - 3, newCursorTop);
-                            System.Console.Write("...");
+                            System.Console.SetCursorPosition(winWidth - _widthEllipsis.Length, newCursorTop);
+                            System.Console.Write(_widthEllipsis);
                         }
                     }
                 }

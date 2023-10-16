@@ -17,7 +17,7 @@ internal static class SessionLoggingScreen
         TimeOnly? startTime = null;
         DateOnly? endDate = null;
         TimeOnly? endTime = null;
-        DateTime now = DateTime.Now;
+        DateTime now = DateTime.UtcNow;
 
         string header(int _1, int _2)
         {
@@ -61,43 +61,40 @@ internal static class SessionLoggingScreen
         string footer(int _1, int _2)
         {
             // Like the body, the footer depends on what has been input so far. Here, we build a string which has the correct hint information.
-            now = DateTime.Now;
-            var hintStart = codingSession?.StartTime.ToLocalTime() ?? now;
-            var hintEnd = codingSession?.EndTime.ToLocalTime() ?? now;
+            now = DateTime.UtcNow;
+            var hintStart = codingSession?.StartTime ?? now;
+            var hintEnd = codingSession?.EndTime ?? now;
 
             string currentInput;
             string currentFormats;
             string currentData;
-            string[] dateFormats = Program.dateFormats.Select(f => f.ToUpper()).ToArray();
-            string[] timeFormats = Program.timeFormats.Select(f => f.ToUpper()).ToArray();
+            void prepareHint(string type, string[] formats, DateTime hintDateTime)
+            {
+                currentInput = type;
+                currentFormats = string.Join(" or ", formats.Select(f => f.ToUpper()).ToArray());
+                currentData = hintDateTime.ToLocalTime().ToString(type == "date" ? Program.mainDateFormat : Program.mainTimeFormat);
+            }
+
             if (startDate == null)
             {
-                currentInput = "date";
-                currentFormats = string.Join(" or ", dateFormats);
-                currentData = hintStart.ToString(Program.mainDateFormat);
+                prepareHint("date", Program.dateFormats, hintStart);
             }
             else if (startTime == null)
             {
-                currentInput = "time";
-                currentFormats = string.Join(" or ", timeFormats);
-                currentData = hintStart.ToString(Program.mainTimeFormat);
+                prepareHint("time", Program.timeFormats, hintStart);
             }
             else if (endDate == null)
             {
-                currentInput = "date";
-                currentFormats = string.Join(" or ", dateFormats);
-                currentData = hintEnd.ToString(Program.mainDateFormat);
+                prepareHint("date", Program.dateFormats, hintEnd);
             }
             else
             {
-                currentInput = "time";
-                currentFormats = string.Join(" or ", timeFormats);
-                currentData = hintEnd.ToString(Program.mainTimeFormat);
+                prepareHint("time", Program.timeFormats, hintEnd);
             }
 
             if (endTime == null)
             {
-                return @$"Input {currentInput} in the format {currentFormats.ToUpper()},
+                return @$"Input {currentInput} in the format {currentFormats},
 or press [Enter] to use the {(codingSession == null ? "current" : "stored")} {currentInput}: {currentData}
 Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}.";
             }
@@ -112,53 +109,27 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
         void promptHandler(string text)
         {
             // This function is called when the user presses [Enter] to submit their input. We can only tell what they were inputting by looking at what has already been input.
-            string[] dateFormats = Program.dateFormats.Select(f => f.ToUpper()).ToArray();
-            string[] timeFormats = Program.timeFormats.Select(f => f.ToUpper()).ToArray();
+            // If the user has input an empty string, we use either the current time or the stored time, depending on whether we are creating or modifying a session.
+
             if (startDate == null)
             {
-                if (string.IsNullOrEmpty(text))
-                {
-                    startDate = DateOnly.FromDateTime(codingSession?.StartTime.ToLocalTime() ?? now);
-                }
-                else
-                {
-                    startDate = ParseDateOnly(text, Program.dateFormats);
-                }
+                ProcessDate(ref startDate, text, codingSession?.StartTime ?? now);
             }
             else if (startTime == null)
             {
-                if (string.IsNullOrEmpty(text))
-                {
-                    startTime = TimeOnly.FromDateTime(codingSession?.StartTime.ToLocalTime() ?? now);
-                }
-                else
-                {
-                    startTime = ParseTimeOnly(text, Program.timeFormats);
-                }
+                ProcessTime(ref startTime, text, codingSession?.StartTime ?? now);
             }
             else if (endDate == null)
             {
-                if (string.IsNullOrEmpty(text))
-                {
-                    endDate = DateOnly.FromDateTime(codingSession?.EndTime.ToLocalTime() ?? now);
-                }
-                else
-                {
-                    endDate = ParseDateOnly(text, Program.dateFormats);
-                }
+                ProcessDate(ref endDate, text, codingSession?.EndTime ?? now);
             }
             else
             {
-                if (string.IsNullOrEmpty(text))
-                {
-                    endTime = TimeOnly.FromDateTime(codingSession?.EndTime.ToLocalTime() ?? now);
-                }
-                else
-                {
-                    endTime = ParseTimeOnly(text, Program.timeFormats);
-                }
+                ProcessTime(ref endTime, text, codingSession?.EndTime ?? now);
+
                 if (endTime != null)
                 {
+                    // If all necessary data has been input, insert or update the session.
                     var newSession = new CodingSession()
                     {
                         Id = codingSession?.Id ?? -1,
@@ -200,6 +171,35 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
         return screen;
     }
 
+    private static DateTime CombineDateTime(DateOnly date, TimeOnly time)
+    {
+        return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second).ToUniversalTime();
+    }
+
+    private static void ProcessDate(ref DateOnly? output, string userInput, DateTime fallback)
+    {
+        if (string.IsNullOrEmpty(userInput))
+        {
+            output = DateOnly.FromDateTime(fallback.ToLocalTime());
+        }
+        else
+        {
+            output = ParseDateOnly(userInput, Program.dateFormats);
+        }
+    }
+
+    private static void ProcessTime(ref TimeOnly? output, string userInput, DateTime fallback)
+    {
+        if (string.IsNullOrEmpty(userInput))
+        {
+            output = TimeOnly.FromDateTime(fallback.ToLocalTime());
+        }
+        else
+        {
+            output = ParseTimeOnly(userInput, Program.timeFormats);
+        }
+    }
+
     private static DateOnly? ParseDateOnly(string text, string[] formats)
     {
         foreach (var format in formats)
@@ -224,10 +224,5 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
         }
         Console.Beep();
         return null;
-    }
-
-    private static DateTime CombineDateTime(DateOnly date, TimeOnly time)
-    {
-        return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second).ToUniversalTime();
     }
 }
