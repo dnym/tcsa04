@@ -1,13 +1,17 @@
 ﻿using CodingTracker.DataAccess;
 using CodingTracker.Models;
+using System.Configuration;
 
 namespace CodingTracker;
 
 internal static class Program
 {
+    const string _defaultConnectionString = "Data Source=CodingTracker.db";
+
     static void Main()
     {
-        IDataAccess dataAccess = new SqliteStorage("Data Source=CodingTracker.db");
+        string connectionString = ConfigurationManager.AppSettings.Get("ConnectionString") ?? _defaultConnectionString;
+        IDataAccess dataAccess = new SqliteStorage(connectionString);
         InsertDummySessions(dataAccess, 50);
         UI.MainMenu.Get(dataAccess).Show();
         Console.Clear();
