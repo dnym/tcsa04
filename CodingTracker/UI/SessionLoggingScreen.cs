@@ -122,7 +122,7 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
                 }
                 else
                 {
-                    startDate = ParseDateOnly(text, dateFormats);
+                    startDate = ParseDateOnly(text, Program.dateFormats);
                 }
             }
             else if (startTime == null)
@@ -133,7 +133,7 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
                 }
                 else
                 {
-                    startTime = ParseTimeOnly(text, timeFormats);
+                    startTime = ParseTimeOnly(text, Program.timeFormats);
                 }
             }
             else if (endDate == null)
@@ -144,7 +144,7 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
                 }
                 else
                 {
-                    endDate = ParseDateOnly(text, dateFormats);
+                    endDate = ParseDateOnly(text, Program.dateFormats);
                 }
             }
             else
@@ -155,7 +155,7 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
                 }
                 else
                 {
-                    endTime = ParseTimeOnly(text, timeFormats);
+                    endTime = ParseTimeOnly(text, Program.timeFormats);
                 }
                 if (endTime != null)
                 {
