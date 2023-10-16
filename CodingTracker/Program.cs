@@ -5,7 +5,7 @@ namespace CodingTracker;
 
 internal static class Program
 {
-    const string _defaultConnectionString = "Data Source=CodingTracker.db";
+    private const string _defaultConnectionString = "Data Source=CodingTracker.db";
     public const string mainDateFormat = "yyyy-MM-dd";
     public const string mainTimeFormat = "HH:mm:ss";
     public const string mainFullFormat = mainDateFormat + " " + mainTimeFormat;
