@@ -176,7 +176,7 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
                         if (overlappingSessions.Any())
                         {
                             Console.Beep();
-                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to {(codingSession==null?"insert":"modify")},\n\t{newSession.StartTime} - {newSession.EndTime},\n\n{(codingSession == null ? "" : "now ")}overlaps with the following session{(overlappingSessions.Count>1?"s":"")}:\n{string.Join("\n", overlappingSessions.Select(s => $"\t{s.StartTime} - {s.EndTime}"))}\n\nPress any key to cancel insertion and return to the main menu.");
+                            var errorScreen = new Screen(body: (_, _) => $"The session you are trying to {(codingSession==null?"insert":"modify")},\n\t{newSession.StartTime.ToLocalTime()} - {newSession.EndTime.ToLocalTime()},\n\n{(codingSession == null ? "" : "now ")}overlaps with the following session{(overlappingSessions.Count>1?"s":"")}:\n{string.Join("\n", overlappingSessions.Select(s => $"\t{s.StartTime.ToLocalTime()} - {s.EndTime.ToLocalTime()}"))}\n\nPress any key to cancel insertion and return to the main menu.");
                             errorScreen.SetAnyKeyAction(() => errorScreen.ExitScreen());
                             errorScreen.Show();
                             screen.ExitScreen();
