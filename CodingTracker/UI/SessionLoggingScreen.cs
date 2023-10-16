@@ -12,10 +12,6 @@ internal static class SessionLoggingScreen
         // The body is made to ask one of four questions, depending on which info has been received through the prompt handler.
         // The footer is made to give state-based hints about what to input.
         // A prompt handling action parses the user's input and calls the data access layer to insert/update the session.
-        const string mainDateFormat = "yyyy-MM-dd";
-        string[] dateFormats = { mainDateFormat };
-        const string mainTimeFormat = "HH:mm:ss";
-        string[] timeFormats = { mainTimeFormat, "HH:mm" };
 
         DateOnly? startDate = null;
         TimeOnly? startTime = null;
@@ -39,10 +35,10 @@ internal static class SessionLoggingScreen
         {
             // The content of the body depends on which input part is currently being asked for. The ones already entered are repeated for convenience.
             var bodyString = string.Empty;
-            var startDatePrompt = "At what date did you start coding? " + (startDate == null ? string.Empty : ((DateOnly)startDate).ToString(mainDateFormat));
-            var startTimePrompt = "At what time did you start coding? " + (startTime == null ? string.Empty : ((TimeOnly)startTime).ToString(mainTimeFormat));
-            var endDatePrompt = "At what date did you stop coding? " + (endDate == null ? string.Empty : ((DateOnly)endDate).ToString(mainDateFormat));
-            var endTimePrompt = "At what time did you stop coding? " + (endTime == null ? string.Empty : ((TimeOnly)endTime).ToString(mainTimeFormat));
+            var startDatePrompt = "At what date did you start coding? " + (startDate == null ? string.Empty : ((DateOnly)startDate).ToString(Program.mainDateFormat));
+            var startTimePrompt = "At what time did you start coding? " + (startTime == null ? string.Empty : ((TimeOnly)startTime).ToString(Program.mainTimeFormat));
+            var endDatePrompt = "At what date did you stop coding? " + (endDate == null ? string.Empty : ((DateOnly)endDate).ToString(Program.mainDateFormat));
+            var endTimePrompt = "At what time did you stop coding? " + (endTime == null ? string.Empty : ((TimeOnly)endTime).ToString(Program.mainTimeFormat));
 
             if (startDate == null)
             {
@@ -72,29 +68,31 @@ internal static class SessionLoggingScreen
             string currentInput;
             string currentFormats;
             string currentData;
+            string[] dateFormats = Program.dateFormats.Select(f => f.ToUpper()).ToArray();
+            string[] timeFormats = Program.timeFormats.Select(f => f.ToUpper()).ToArray();
             if (startDate == null)
             {
                 currentInput = "date";
                 currentFormats = string.Join(" or ", dateFormats);
-                currentData = hintStart.ToString(mainDateFormat);
+                currentData = hintStart.ToString(Program.mainDateFormat);
             }
             else if (startTime == null)
             {
                 currentInput = "time";
                 currentFormats = string.Join(" or ", timeFormats);
-                currentData = hintStart.ToString(mainTimeFormat);
+                currentData = hintStart.ToString(Program.mainTimeFormat);
             }
             else if (endDate == null)
             {
                 currentInput = "date";
                 currentFormats = string.Join(" or ", dateFormats);
-                currentData = hintEnd.ToString(mainDateFormat);
+                currentData = hintEnd.ToString(Program.mainDateFormat);
             }
             else
             {
                 currentInput = "time";
                 currentFormats = string.Join(" or ", timeFormats);
-                currentData = hintEnd.ToString(mainTimeFormat);
+                currentData = hintEnd.ToString(Program.mainTimeFormat);
             }
 
             if (endTime == null)
@@ -114,6 +112,8 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
         void promptHandler(string text)
         {
             // This function is called when the user presses [Enter] to submit their input. We can only tell what they were inputting by looking at what has already been input.
+            string[] dateFormats = Program.dateFormats.Select(f => f.ToUpper()).ToArray();
+            string[] timeFormats = Program.timeFormats.Select(f => f.ToUpper()).ToArray();
             if (startDate == null)
             {
                 if (string.IsNullOrEmpty(text))

@@ -138,9 +138,8 @@ internal static class LogManagementScreen
             tableData.Add(new List<object>
             {
                 i + 1,
-                // TODO: Centralize the time formats.
-                session.StartTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
-                session.EndTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
+                session.StartTime.ToLocalTime().ToString(Program.mainFullFormat),
+                session.EndTime.ToLocalTime().ToString(Program.mainFullFormat),
                 DurationString(session.Duration),
             });
         }
