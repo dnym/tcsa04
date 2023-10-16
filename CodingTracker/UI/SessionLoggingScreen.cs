@@ -19,7 +19,7 @@ internal static class SessionLoggingScreen
         TimeOnly? endTime = null;
         DateTime now = DateTime.UtcNow;
 
-        string header(int _1, int _2)
+        string Header(int _1, int _2)
         {
             if (codingSession == null)
             {
@@ -31,10 +31,9 @@ internal static class SessionLoggingScreen
             }
         }
 
-        string body(int _1, int _2)
+        string Body(int _1, int _2)
         {
             // The content of the body depends on which input part is currently being asked for. The ones already entered are repeated for convenience.
-            var bodyString = string.Empty;
             var startDatePrompt = "At what date did you start coding? " + (startDate == null ? string.Empty : ((DateOnly)startDate).ToString(Program.mainDateFormat));
             var startTimePrompt = "At what time did you start coding? " + (startTime == null ? string.Empty : ((TimeOnly)startTime).ToString(Program.mainTimeFormat));
             var endDatePrompt = "At what date did you stop coding? " + (endDate == null ? string.Empty : ((DateOnly)endDate).ToString(Program.mainDateFormat));
@@ -58,7 +57,7 @@ internal static class SessionLoggingScreen
             }
         }
 
-        string footer(int _1, int _2)
+        string Footer(int _1, int _2)
         {
             // Like the body, the footer depends on what has been input so far. Here, we build a string which has the correct hint information.
             now = DateTime.UtcNow;
@@ -104,9 +103,9 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
             }
         }
 
-        var screen = new Screen(header: header, body: body, footer: footer);
+        var screen = new Screen(header: Header, body: Body, footer: Footer);
 
-        void promptHandler(string text)
+        void PromptHandler(string text)
         {
             // This function is called when the user presses [Enter] to submit their input. We can only tell what they were inputting by looking at what has already been input.
             // If the user has input an empty string, we use either the current time or the stored time, depending on whether we are creating or modifying a session.
@@ -166,7 +165,7 @@ Press [Esc] to cancel {(codingSession == null ? "insertion" : "modification")}."
                 }
             }
         }
-        screen.SetPromptAction(promptHandler);
+        screen.SetPromptAction(PromptHandler);
         screen.AddAction(ConsoleKey.Escape, () => screen.ExitScreen());
         return screen;
     }

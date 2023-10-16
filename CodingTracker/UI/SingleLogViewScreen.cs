@@ -21,28 +21,28 @@ internal static class SingleLogViewScreen
 
     private static Screen GetErrorScreen()
     {
-        static string body(int _1, int _2)
+        static string Body(int _1, int _2)
         {
             return "There is no coding session with that id.\n\nPress any key to return.";
         }
-        var screen = new Screen(body: body);
+        var screen = new Screen(body: Body);
         screen.SetAnyKeyAction(() => screen.ExitScreen());
         return screen;
     }
 
     private static Screen GetScreen(IDataAccess dataAccess, int id)
     {
-        static string header(int _1, int _2)
+        static string Header(int _1, int _2)
         {
             return "Viewing Coding Session";
         }
 
-        static string footer(int _1, int _2)
+        static string Footer(int _1, int _2)
         {
             return "Press [M] to modify the session,\n[D] to delete,\nor [Esc] to go back to the main menu.";
         }
 
-        string body(int _1, int _2)
+        string Body(int _1, int _2)
         {
             var session = dataAccess.Get(id)!;
             string start = session.StartTime.ToLocalTime().ToString(Program.mainFullFormat);
@@ -51,7 +51,7 @@ internal static class SingleLogViewScreen
             return $"Start: {start}\nEnd: {end}\nDuration: {duration}";
         }
 
-        var screen = new Screen(header: header, body: body, footer: footer);
+        var screen = new Screen(header: Header, body: Body, footer: Footer);
         screen.AddAction(ConsoleKey.Escape, () => screen.ExitScreen());
         screen.AddAction(ConsoleKey.M, () =>
         {

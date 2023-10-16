@@ -18,7 +18,7 @@ internal static class LogManagementScreen
         int listUsableHeight = 0;
         int skip = 0;
 
-        string header(int _, int usableHeight)
+        string Header(int _, int usableHeight)
         {
             listUsableHeight = usableHeight - headerHeight - footerHeight - promptHeight;
             if (listUsableHeight != lastListUsableHeight)
@@ -40,7 +40,7 @@ internal static class LogManagementScreen
             }
         }
 
-        string footer(int _1, int _2)
+        string Footer(int _1, int _2)
         {
             const string escHint = "[Esc] to go back to the main menu.";
             var output = "Press ";
@@ -60,7 +60,7 @@ internal static class LogManagementScreen
             return output;
         }
 
-        string body(int _1, int _2)
+        string Body(int _1, int _2)
         {
             const string prompt = "\nSelect a session to manage: ";
             if (dataAccess.Count() == 0)
@@ -73,7 +73,7 @@ internal static class LogManagementScreen
             return MakeListString(sessions) + prompt;
         }
 
-        void pgUp()
+        void PgUp()
         {
             if (skip > 0)
             {
@@ -81,7 +81,7 @@ internal static class LogManagementScreen
             }
         }
 
-        void pgDown()
+        void PgDown()
         {
             if (dataAccess.Count() - skip > ListItemsPerPage(listUsableHeight))
             {
@@ -89,9 +89,9 @@ internal static class LogManagementScreen
             }
         }
 
-        var screen = new Screen(header: header, body: body, footer: footer);
+        var screen = new Screen(header: Header, body: Body, footer: Footer);
 
-        void handleUserInput(string text)
+        void HandleUserInput(string text)
         {
             if (int.TryParse(text, out int result) && result >= 1 && result <= listNumbersToIds.Length)
             {
@@ -114,11 +114,11 @@ internal static class LogManagementScreen
             }
         }
         screen.AddAction(ConsoleKey.Escape, () => screen.ExitScreen());
-        screen.AddAction(ConsoleKey.PageUp, pgUp);
-        screen.AddAction(ConsoleKey.PageDown, pgDown);
+        screen.AddAction(ConsoleKey.PageUp, PgUp);
+        screen.AddAction(ConsoleKey.PageDown, PgDown);
         if (dataAccess.Count() > 0)
         {
-            screen.SetPromptAction(handleUserInput);
+            screen.SetPromptAction(HandleUserInput);
         }
         return screen;
     }
